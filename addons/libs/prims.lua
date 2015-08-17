@@ -46,14 +46,14 @@ function prims.new(settings)
     settings = settings or {}
     settings.pos = settings.pos or {0, 0}
     local m = {
-        color = settings.color or {0, 0, 0, 0},
+        color = settings.color or {255, 255, 255, 255},
         width = settings.w or 0,
         height = settings.h or 0,
         visible = settings.visible or false,
         image = settings.set_texture or false,
         texture = settings.texture,
         fit = settings.fit_texture or false,
-        tile = settings.tile or {0, 0},
+        tile = settings.tile or {1, 1},
         events = {}
     }
     m.x1, m.x2 = m.width >= 0 and settings.pos[1], m.width + settings.pos[1] or m.width + settings.pos[1], settings.pos[1]
@@ -64,18 +64,23 @@ function prims.new(settings)
     windower.prim.create(m.name)
     --defaults for prims seem pointless, but these will prevent errors if people forget information.
 
-    windower.prim.set_color(m.name, unpack(m.color))
+    if settings.color then
+        windower.prim.set_color(m.name, unpack(m.color))
+    end
+    
     windower.prim.set_position(m.name, m.x1, m.y2)
     windower.prim.set_size(m.name, m.width, m.height)
     windower.prim.set_visibility(m.name, m.visible)
+
     if m.image then
         windower.prim.set_fit_to_texture(m.name, m.fit)
         windower.prim.set_texture(m.name, m.texture)
-        windower.prim.set_repeat(m.name, unpack(m.tile))
+        if settings.tile then
+            windower.prim.set_repeat(m.name, unpack(m.tile))
+        end
     end
-
+    
     return setmetatable(t, _meta.Prim)
-
 end
 
 -- Makes the primitive visible
@@ -139,6 +144,26 @@ function prims.pos_y(t, y)
     windower.prim.set_position(m.name, m.width >= 0 and m.x1 or m.x2, y)
 
     m.y1, m.y2 = m.height >= 0 and m.height + y, y or y, m.height + y 
+end
+
+function prims.right(t, d)
+    local m = meta[t]
+    t:pos_x((m.width >= 0 and m.x1 or m.x2) + d)
+end
+
+function prims.left(t, d)
+    local m = meta[t]
+    t:pos_x((m.width >= 0 and m.x1 or m.x2) - d)
+end
+
+function prims.up(t, d)
+    local m = meta[t]
+    t:pos_y((m.height >= 0 and m.y2 or m.y1) - d)
+end
+
+function prims.down(t, d)
+    local m = meta[t]
+    t:pos_y((m.height >= 0 and m.y2 or m.y1) + d)
 end
 
 function prims.width(t, width)
@@ -381,15 +406,9 @@ function prims.register_event(t, event, fn)
     local m = meta[t].events
 
     m[event] = m[event] or {n = 0}
-    local n
-    for i = 1, m[event].n do
-        if not m[event][i] then
-            n = i
-            break
-        end
-    end
-    n = n or m[event].n + 1
+    local n = #m[event] + 1
     m[event][n] = fn
+    m[event].n = m[event].n > n and m[event].n or n
 
     return n
 end
