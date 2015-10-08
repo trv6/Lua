@@ -9,7 +9,7 @@ _libs = _libs or {}
 _libs.scrolling_text = scrolling_text
 
 _libs.texts = _libs.texts or require 'texts'
-_libs.prims = _libs.prims or require 'prims'
+_libs.prims = _libs.prims or require 'widgets/prims'
 
 local texts = _libs.texts
 local prims = _libs.prims
@@ -156,7 +156,9 @@ function scrolling_text.fit(t, fit_x, fit_y)
     coroutine.sleep(.02)
     
     local w, h = t.content:extents()
-    w = w > m.temp_w and w or m.temp_w
+    if m.temp_w then
+        w = w > m.temp_w and w or m.temp_w
+    end
     
     if fit_x and w ~= m.w then
         m.temp_w = w

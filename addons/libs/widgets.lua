@@ -7,15 +7,56 @@ To Do:
     Add grids.
     Find bugs (There Will Be Bugs).
 --]]
+widgets = {
+    saved_widgets = {
+        buttons = setmetatable({}, {__newindex = function(t, k, v)
+            -- t :: widgets.saved_widgets.buttons, k :: n, v :: widget object
+            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
+                --u :: meta[t].events, l :: event string, w :: function list
+                event_registrar[v] = u
+                table.insert(event_object_list[l], t)
+                rawset(u, l, w)
+            end})
+            events.left_click = {n = 0}         -- Adds widget classes to event_object_list even if no custom event
+            events.left_click_release = {n = 0} -- is registered. Allows class-specific events to be created in the mouse event.
+        end}),
+        scroll_texts = setmetatable({}, {__newindex = function(t, k, v)
+            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
+                event_registrar[v] = u
+                table.insert(event_object_list[l], t)
+                rawset(u, l, w)
+            end})
+            events.scroll = {n = 0}
+        end}),
+        scroll_menus = setmetatable({}, {__newindex = function(t, k, v)
+            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
+                event_registrar[v] = u
+                table.insert(event_object_list[l], t)
+                rawset(u, l, w)
+            end})
+            events.left_click = {n = 0}
+            events.scroll = {n = 0}
+        end}),
+        sliders = setmetatable({}, {__newindex = function(t, k, v)
+            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
+                event_registrar[v] = u
+                table.insert(event_object_list[l], t)
+                rawset(u, l, w)
+            end})
+            events.left_click = {n = 0}
+            events.left_click_release = {n = 0}
+        end}),
+    }
+}
 
 _libs = _libs or {}
 _libs.widgets = widgets
-prims = _libs.prims or require('prims')
+prims = _libs.prims or require('widgets/prims')
 texts = _libs.texts or require('texts')
-buttons = _libs.buttons or require('button')
-sliders = _libs.slider or require('slider')
-scroll_text = _libs.scrolling_text or require('scroll_text')
-scroll_menu = _libs.scrolling_text_menu or require('scroll_menu')
+buttons = _libs.buttons or require('widgets/button')
+sliders = _libs.slider or require('widgets/slider')
+scroll_text = _libs.scrolling_text or require('widgets/scroll_text')
+scroll_menu = _libs.scrolling_text_menu or require('widgets/scroll_menu')
 
 function class(o)
     local mt = getmetatable(o)
@@ -71,49 +112,6 @@ local event_object_list = {}
 for k, v in pairs(events) do
     event_object_list[k] = setmetatable({n = 0}, basic_array)
 end
-
-widgets = {
-    saved_widgets = {
-        buttons = setmetatable({}, {__newindex = function(t, k, v)
-            -- t :: widgets.saved_widgets.buttons, k :: n, v :: widget object
-            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
-                --u :: meta[t].events, l :: event string, w :: function list
-                event_registrar[v] = u
-                table.insert(event_object_list[l], t)
-                rawset(u, l, w)
-            end})
-            events.left_click = {n = 0}         -- Adds widget classes to event_object_list even if no custom event
-            events.left_click_release = {n = 0} -- is registered. Allows class-specific events to be created in the mouse event.
-        end}),
-        scroll_texts = setmetatable({}, {__newindex = function(t, k, v)
-            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
-                event_registrar[v] = u
-                table.insert(event_object_list[l], t)
-                rawset(u, l, w)
-            end})
-            events.scroll = {n = 0}
-        end}),
-        scroll_menus = setmetatable({}, {__newindex = function(t, k, v)
-            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
-                event_registrar[v] = u
-                table.insert(event_object_list[l], t)
-                rawset(u, l, w)
-            end})
-            events.left_click = {n = 0}
-            events.scroll = {n = 0}
-        end}),
-        sliders = setmetatable({}, {__newindex = function(t, k, v)
-            local events = setmetatable(v:get_events(), {__newindex = function(u, l, w)
-                event_registrar[v] = u
-                table.insert(event_object_list[l], t)
-                rawset(u, l, w)
-            end})
-            events.left_click = {n = 0}
-            events.left_click_release = {n = 0}
-        end}),
-    }
-}
-
 
 local default_behavior = {
     Slider = {

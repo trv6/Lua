@@ -9,7 +9,7 @@ _libs = _libs or {}
 _libs.buttons = buttons
 
 _libs.texts = _libs.texts or require 'texts'
-_libs.prims = _libs.prims or require 'prims'
+_libs.prims = _libs.prims or require 'widgets/prims'
 
 local texts = _libs.texts
 local prims = _libs.prims

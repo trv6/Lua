@@ -8,7 +8,7 @@ widgets.saved_widgets.sliders = widgets.saved_widgets.sliders or {}
 _libs = _libs or {}
 _libs.slider = slider
 
-_libs.prims = _libs.prims or require 'prims'
+_libs.prims = _libs.prims or require 'widgets/prims'
 local prims = _libs.prims
 
 _meta = _meta or {}
