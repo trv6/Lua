@@ -69,7 +69,6 @@ function get_templates()
     local t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
-        print('No template for spells was found.')
         spells_template = t_temp
     else
         spells_template = spells_template()
@@ -79,7 +78,6 @@ function get_templates()
     t_temp = L(res.weapon_skills:keyset())
     ws_template = loadfile(windower.addon_path .. 'data/ws_template.lua')
     if not ws_template then
-        print('No template for weapon skills was found.')
         ws_template = t_temp
     else
         ws_template = ws_template()
@@ -100,7 +98,6 @@ function get_templates()
     t_temp = L(res.job_abilities:prefix('/jobability'):keyset())
     ja_template = loadfile(windower.addon_path .. 'data/ja_template.lua')
     if not ja_template then
-        print('No template for job abilities was found.')
         ja_template = t_temp
     else
         ja_template = ja_template()
@@ -121,7 +118,6 @@ function get_templates()
     t_temp = L(res.job_abilities:prefix('/pet'):keyset())
     pet_command_template = loadfile(windower.addon_path .. 'data/pet_command_template.lua')
     if not pet_command_template then
-        print('No template for pet commands was found.')
         pet_command_template = t_temp
     else
         pet_command_template = pet_command_template()
@@ -237,8 +233,9 @@ end
 
 windower.register_event('incoming chunk', function(id, data)
     if is_menu_open and id == 0x0AC and last_menu_open.type ~= 1 then
-        if not S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]]):equals(available_category) then
-            available_category = S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]])
+        local current_abilities = S(remove_categories(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]]))
+        if not current_abilities:equals(available_category) then
+            available_category = current_abilities
             current_menu = recursively_copy_spells({spells_template,ws_template,ja_template,pet_command_template}[last_menu_open.type])
             menu_building_snippet()
         end
@@ -251,6 +248,7 @@ windower.register_event('gain buff', function(buff_id)
         number_of_jps = count_job_points()
         current_menu = recursively_copy_spells(spells_template)
         menu_building_snippet()
+--        menu_general_layout(S(remove_categories(windower.ffxi.get_abilities().job_abilities)),ja_template,3)
     end
 end)
 
@@ -586,7 +584,7 @@ function determine_accessibility(spell,type) -- ability filter, slightly modifie
             return false
         elseif spell.type == 'BlueMagic' and not ((player_info.main_job == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
             ((active_buffs[485] or active_buffs[505]) and unbridled_learning_set[spell.english])) and not
-            (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            (player_info.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             return false
         end
         return true

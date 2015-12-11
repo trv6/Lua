@@ -57,7 +57,7 @@ function recursively_merge_tables(m_menu,s_menu)
                     m_menu.sub_menus.n = m_menu.sub_menus.n + 1
                     m_menu[s_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
                 else
-                    m_menu[s_menu.s_menu[i]] = recursively_merge_tables(m_menu[s_menu.s_menu[i]],s_menu[s_menu.s_menu[i]])
+                    m_menu[s_menu.sub_menus[i]] = recursively_merge_tables(m_menu[s_menu.sub_menus[i]],s_menu[s_menu.sub_menus[i]])
                 end
             end
             for i=1,s_menu.n do
